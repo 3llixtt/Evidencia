@@ -15,21 +15,19 @@ Programa en Java que simula un sistema de administración de citas para un consu
 ### Pasos
 
 1. Clona el repositorio:
-   ```bash
-   git clone [URL del repositorio]
-   cd [nombre-del-repositorio]
-   ```
+
+
+
 2. Cambia a la rama de desarrollo:
-   ```bash
-   git checkout develop
-   ```
+
+
+
 3. Abre la carpeta del proyecto en IntelliJ IDEA (**File → Open**).
 4. Configura el SDK del proyecto en **File → Project Structure → Project → SDK** y selecciona JDK 11.
 5. Verifica la instalación desde una terminal:
-   ```bash
-   java -version
-   git --version
-   ```
+
+
+
 
 ### Generar el FAT JAR (portabilidad)
 
@@ -39,9 +37,6 @@ El programa se empaquetará como un archivo FAT JAR con todas sus dependencias i
 
 Ejecución del programa (una vez generado el JAR):
 
-```bash
-java -jar [nombre-del-archivo].jar
-```
 
 Funcionalidades previstas:
 
@@ -55,8 +50,7 @@ Funcionalidades previstas:
 
 ## Créditos
 
-- [Tu nombre completo], estudiante.
-- [Nombre de la materia y del profesor].
+- Javier Sanchez, estudiante.
 
 ## Licencia
 
