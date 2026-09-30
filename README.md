@@ -16,11 +16,7 @@ Programa en Java que simula un sistema de administración de citas para un consu
 
 1. Clona el repositorio:
 
-
-
 2. Cambia a la rama de desarrollo:
-
-
 
 3. Abre la carpeta del proyecto en IntelliJ IDEA (**File → Open**).
 4. Configura el SDK del proyecto en **File → Project Structure → Project → SDK** y selecciona JDK 11.
@@ -50,8 +46,4 @@ Funcionalidades previstas:
 
 ## Créditos
 
-- Javier Sanchez, estudiante.
-
-## Licencia
-
-Este proyecto se distribuye bajo la licencia MIT. Consulta el archivo `LICENSE` para más información.
+- Javier Sanchez,estudiante.
