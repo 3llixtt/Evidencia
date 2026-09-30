@@ -1,0 +1,25 @@
+# Archivos compilados de Java
+*.class
+
+# Archivos temporales de editores (vim)
+*.swp
+*.swo
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Salidas de compilación y empaquetado
+build/
+target/
+*.jar
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Registros
+*.log
