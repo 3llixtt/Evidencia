@@ -1,0 +1,146 @@
+// ================= INTERFACES =================
+INTERFAZ Almacenable
+    MÉTODO aCSV(): Texto
+
+INTERFAZ Repositorio<T>
+    MÉTODO guardarTodos(lista: Lista<T>)
+    MÉTODO cargarTodos(): Lista<T>
+
+// ================= MODELO =================
+CLASE ABSTRACTA Persona IMPLEMENTA Almacenable
+    ATRIBUTOS id: Texto, nombreCompleto: Texto
+    MÉTODO getId(): Texto
+    MÉTODO getNombreCompleto(): Texto
+    MÉTODO ABSTRACTO aCSV(): Texto
+
+CLASE Doctor HEREDA DE Persona
+    ATRIBUTO especialidad: Texto
+    MÉTODO aCSV(): Texto
+        REGRESAR id + "," + nombreCompleto + "," + especialidad
+
+CLASE Paciente HEREDA DE Persona
+    MÉTODO aCSV(): Texto
+        REGRESAR id + "," + nombreCompleto
+
+CLASE Administrador HEREDA DE Persona
+    ATRIBUTO contrasena: Texto
+    MÉTODO autenticar(idIngresado, contrasenaIngresada): Booleano
+        REGRESAR id = idIngresado Y contrasena = contrasenaIngresada
+    MÉTODO aCSV(): Texto
+        REGRESAR id + "," + nombreCompleto + "," + contrasena
+
+CLASE Cita IMPLEMENTA Almacenable
+    ATRIBUTOS id: Texto, fechaHora: FechaHora, motivo: Texto,
+              doctor: Doctor, paciente: Paciente
+    MÉTODO aCSV(): Texto
+        REGRESAR id + "," + fechaHora + "," + motivo + ","
+                 + doctor.getId() + "," + paciente.getId()
+
+CLASE SistemaCitasException HEREDA DE Exception
+    CONSTRUCTOR(mensaje: Texto)
+
+// ================= PERSISTENCIA =================
+CLASE RepositorioCSV<T EXTIENDE Almacenable> IMPLEMENTA Repositorio<T>
+    ATRIBUTOS rutaArchivo: Texto, convertidor: Función(Texto) -> T
+
+    MÉTODO guardarTodos(lista)
+        ABRIR rutaArchivo para escritura        // se cierra al terminar
+        PARA CADA elemento EN lista HACER
+            ESCRIBIR elemento.aCSV() en una línea
+        SI ocurre un error de E/S ENTONCES
+            LANZAR SistemaCitasException("No se pudo guardar el archivo")
+
+    MÉTODO cargarTodos(): Lista<T>
+        lista ← lista vacía
+        SI el archivo no existe ENTONCES REGRESAR lista
+        ABRIR rutaArchivo para lectura          // se cierra al terminar
+        PARA CADA línea EN archivo HACER
+            AGREGAR convertidor(línea) A lista
+        SI ocurre un error de E/S ENTONCES
+            LANZAR SistemaCitasException("No se pudo leer el archivo")
+        REGRESAR lista
+
+// ================= CONTROL =================
+CLASE SistemaCitas
+    ATRIBUTOS doctores, pacientes, administradores, citas (listas)
+
+    MÉTODO cargarDatos()
+        doctores ← repositorioDoctores.cargarTodos()
+        pacientes ← repositorioPacientes.cargarTodos()
+        administradores ← repositorioAdministradores.cargarTodos()
+        citas ← repositorioCitas.cargarTodos()  // busca doctor y paciente por ID
+        SI administradores está vacía ENTONCES
+            AGREGAR un administrador inicial y guardarDatos()
+
+    MÉTODO guardarDatos()
+        guardar las cuatro listas con sus repositorios
+
+    MÉTODO iniciarSesion(id, contrasena): Booleano
+        PARA CADA admin EN administradores HACER
+            SI admin.autenticar(id, contrasena) ENTONCES REGRESAR verdadero
+        REGRESAR falso
+
+    MÉTODO altaDoctor(id, nombre, especialidad)
+        SI algún dato está vacío ENTONCES
+            LANZAR SistemaCitasException("Datos incompletos")
+        SI ya existe un doctor con ese id ENTONCES
+            LANZAR SistemaCitasException("El identificador ya existe")
+        AGREGAR nuevo Doctor(id, nombre, especialidad) A doctores
+        guardarDatos()
+
+    MÉTODO altaPaciente(id, nombre)
+        SI algún dato está vacío ENTONCES
+            LANZAR SistemaCitasException("Datos incompletos")
+        SI ya existe un paciente con ese id ENTONCES
+            LANZAR SistemaCitasException("El identificador ya existe")
+        AGREGAR nuevo Paciente(id, nombre) A pacientes
+        guardarDatos()
+
+    MÉTODO crearCita(id, fechaHora, motivo, idDoctor, idPaciente)
+        SI ya existe una cita con ese id ENTONCES
+            LANZAR SistemaCitasException("El identificador ya existe")
+        doctor ← buscar en doctores el de id = idDoctor
+        paciente ← buscar en pacientes el de id = idPaciente
+        SI doctor es nulo O paciente es nulo ENTONCES
+            LANZAR SistemaCitasException("Doctor o paciente no encontrado")
+        AGREGAR nueva Cita(id, fechaHora, motivo, doctor, paciente) A citas
+        guardarDatos()
+
+    MÉTODO listarCitas()
+        SI citas está vacía ENTONCES MOSTRAR "No hay citas registradas"
+        PARA CADA cita EN citas HACER
+            MOSTRAR id, fechaHora, motivo, nombre del doctor y del paciente
+
+// ================= PROGRAMA PRINCIPAL =================
+CLASE Main
+    MÉTODO main()
+        sistema ← nuevo SistemaCitas()
+        INTENTAR
+            sistema.cargarDatos()
+        CAPTURAR SistemaCitasException e
+            MOSTRAR e.mensaje
+
+        autenticado ← falso
+        MIENTRAS autenticado = falso HACER
+            LEER id, contrasena
+            SI sistema.iniciarSesion(id, contrasena) ENTONCES
+                autenticado ← verdadero
+            SI NO
+                MOSTRAR "Credenciales incorrectas"
+
+        opcion ← -1
+        MIENTRAS opcion ≠ 0 HACER
+            MOSTRAR menú (1 Alta doctor, 2 Alta paciente, 3 Crear cita,
+                          4 Listar citas, 0 Salir)
+            LEER opcion
+            INTENTAR
+                SEGÚN opcion HACER
+                    1: LEER id, nombre, especialidad; sistema.altaDoctor(...)
+                    2: LEER id, nombre; sistema.altaPaciente(...)
+                    3: LEER id, fecha y hora, motivo, idDoctor, idPaciente
+                       sistema.crearCita(...)
+                    4: sistema.listarCitas()
+                    0: sistema.guardarDatos()
+                MOSTRAR mensaje de confirmación
+            CAPTURAR SistemaCitasException O cualquier Exception e
+                MOSTRAR "Error: " + e.mensaje    // el programa continúa
